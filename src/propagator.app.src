@@ -1,0 +1,14 @@
+{application, propagator, [
+  {description, "Pub/Sub for Erlang processes."},
+  {vsn, "0.1"},
+  {modules, []},
+  {registered, [
+    propagator_sup
+  ]},
+  {applications, [
+    kernel,
+    stdlib
+  ]},
+  {mod, {propagator_app, []}},
+  {env, []}
+]}.
