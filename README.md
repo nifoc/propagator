@@ -10,7 +10,7 @@ This is alpha software. Things might still change in ways that break everything.
 
 ## Usage
 
-**While `pg2' is used internally, having groups span multiple nodes is not supported.**
+**While `pg2` is used internally, having groups span multiple nodes is not supported.**
 
 ### Working with groups
 
