@@ -40,8 +40,8 @@
   unsubscribe/2,
   groups/0,
   is_group/1,
-  members/1,
-  is_member/2,
+  subscribers/1,
+  is_subscriber/2,
   statistics/1
 ]).
 
@@ -104,7 +104,7 @@ subscribe(Group) ->
 subscribe(Group, Pid) ->
   case is_group(Group) of
     true ->
-      case is_member(Group, Pid) of
+      case is_subscriber(Group, Pid) of
         true -> ok;
         false -> pg2:join(Group, Pid)
       end;
@@ -134,14 +134,14 @@ is_group(Group) ->
   ets:member(propagator_groups, Group).
 
 % @doc Returns a list of all processes that are subscribed to a `Group'.
--spec members(group()) -> [pid()] | {error, term()}.
-members(Group) ->
+-spec subscribers(group()) -> [pid()] | {error, term()}.
+subscribers(Group) ->
   pg2:get_local_members(Group).
 
 % @doc Checks wether or not `Pid' is subscribed to `Group'.
--spec is_member(group(), pid()) -> boolean().
-is_member(Group, Pid) ->
-  case members(Group) of
+-spec is_subscriber(group(), pid()) -> boolean().
+is_subscriber(Group, Pid) ->
+  case subscribers(Group) of
     {error, _Reason} -> false;
     Members -> lists:member(Pid, Members)
   end.
@@ -149,6 +149,7 @@ is_member(Group, Pid) ->
 % @doc Returns a property list with statistics about a given group.<br /><br />
 %      Currently the following keys are returned:<br />
 %      `group': The name of the group<br />
+%      `subscriber_count': Current number of subscribers<br />
 %      `message_count': Number if unique messages this process (group) sent
 -spec statistics(group()) -> {ok, [{atom(), term()}]} | {error, term()}.
 statistics(Group) ->

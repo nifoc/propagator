@@ -52,12 +52,13 @@ start_link(Group) ->
 loop(#group_state{group=Group, msg_count=MsgCount}=State) ->
   State2 = receive
     {send_message, _From, {Group, _Tag, _Data}=Msg} ->
-      Members = propagator:members(Group),
+      Members = propagator:subscribers(Group),
       ok = lists:foreach(fun(Member) -> Member ! Msg end, Members),
       State#group_state{msg_count=MsgCount+1};
     {statistics, From, Ref} ->
       Stats = [
         {group, Group},
+        {subscriber_count, length(propagator:subscribers(Group))},
         {message_count, MsgCount}
       ],
       _ = From ! {Ref, Stats},

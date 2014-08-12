@@ -22,7 +22,7 @@
 % Tests
 -export([
   groups_actions/1,
-  member_actions/1,
+  subscriber_actions/1,
   messages/1,
   stats/1,
   ignore_unknown_messages/1
@@ -33,7 +33,7 @@
 all() ->
   [
     groups_actions,
-    member_actions,
+    subscriber_actions,
     messages,
     stats,
     ignore_unknown_messages
@@ -60,23 +60,23 @@ groups_actions(_Config) ->
   ok = propagator:delete(temp),
   [test] = propagator:groups().
 
-member_actions(_Config) ->
+subscriber_actions(_Config) ->
   Pid = self(),
-  [] = propagator:members(test),
-  {error, {no_such_group, temp}} = propagator:members(temp),
+  [] = propagator:subscribers(test),
+  {error, {no_such_group, temp}} = propagator:subscribers(temp),
   ok = propagator:subscribe(test),
   {error, {no_such_group, temp}} = propagator:subscribe(temp),
-  [Pid] = propagator:members(test),
+  [Pid] = propagator:subscribers(test),
   ok = propagator:subscribe(test, Pid),
-  [Pid] = propagator:members(test),
-  true = propagator:is_member(test, Pid),
-  false = propagator:is_member(temp, Pid),
+  [Pid] = propagator:subscribers(test),
+  true = propagator:is_subscriber(test, Pid),
+  false = propagator:is_subscriber(temp, Pid),
   {error, {no_such_group, temp}} = propagator:unsubscribe(temp),
   ok = propagator:unsubscribe(test),
-  [] = propagator:members(test),
+  [] = propagator:subscribers(test),
   ok = propagator:unsubscribe(test, Pid),
-  [] = propagator:members(test),
-  false = propagator:is_member(test, Pid).
+  [] = propagator:subscribers(test),
+  false = propagator:is_subscriber(test, Pid).
 
 messages(_Config) ->
   ok = propagator:subscribe(test),
