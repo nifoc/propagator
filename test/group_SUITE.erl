@@ -24,6 +24,7 @@
   groups_actions/1,
   subscriber_actions/1,
   messages/1,
+  no_messages/1,
   stats/1,
   ignore_unknown_messages/1
 ]).
@@ -35,6 +36,7 @@ all() ->
     groups_actions,
     subscriber_actions,
     messages,
+    no_messages,
     stats,
     ignore_unknown_messages
   ].
@@ -87,7 +89,26 @@ messages(_Config) ->
     {test, test, Ref} -> ok;
     _ -> error
   after
-    5000 -> error
+    2000 -> error
+  end.
+
+no_messages(_Config) ->
+  ok = propagator:subscribe(test),
+  Ref = make_ref(),
+  ok = propagator:publish(test, test, Ref),
+  ok = receive
+    {test, test, Ref} -> ok;
+    _ -> error
+  after
+    2000 -> error
+  end,
+  ok = propagator:unsubscribe(test),
+  ok = propagator:publish(test, test, Ref),
+  ok = receive
+    {test, test, Ref} -> error;
+    _ -> error
+  after
+    2000 -> ok
   end.
 
 stats(_Config) ->
