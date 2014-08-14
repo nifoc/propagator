@@ -29,6 +29,7 @@
 
 % Loop
 -export([
+  init/1,
   loop/1
 ]).
 
@@ -37,15 +38,18 @@
 % @doc Starts a group server process.
 -spec start_link(propagator:group()) -> {ok, pid()}.
 start_link(Group) ->
-  State = #group_state{group=Group, msg_count=0},
-  Pid = spawn_link(fun() ->
-    process_flag(trap_exit, true),
-    loop(State)
-  end),
+  Pid = spawn_link(?MODULE, init, [Group]),
   true = ets:insert(propagator_groups, {Group, Pid}),
   {ok, Pid}.
 
 % Loop
+
+% @hidden
+-spec init(propagator:group()) -> no_return().
+init(Group) ->
+  _ = process_flag(trap_exit, true),
+  State = #group_state{group=Group, msg_count=0},
+  loop(State).
 
 % @hidden
 -spec loop(state()) -> no_return().
