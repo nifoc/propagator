@@ -54,6 +54,10 @@ You can unsubscribe any process using the `propagator:unsubscribe/2` method. `pr
 ok = propagator:unsubscribe(demo).
 ```
 
+## Resources
+
+* [Generated EDoc](http://propagator.nifoc.pw/0.1/) ([All Versions](http://propagator.nifoc.pw))
+
 ## License
 
 [ISC](https://en.wikipedia.org/wiki/ISC_license).
