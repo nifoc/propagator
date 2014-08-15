@@ -12,6 +12,7 @@
 % @copyright {@years} Daniel Kempkens
 % @version {@version}
 % @doc A `propagator_group' process is responsible for sending messages to all members of a group.
+%      Sending is done using a separate process so that the publisher is never blocked.
 
 -module(propagator_group).
 

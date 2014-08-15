@@ -82,8 +82,8 @@ delete(Group) ->
     error:badarg -> ok
   end.
 
-% @doc Publishes `Data' to `Group' and broadcasts it to all subscribers. All messages have to be tagged, so that subscribers
-%      can easily pattern-match on the messages they receive.
+% @doc Publishes `Data' to `Group' and broadcasts it to all subscribers. All messages have to be tagged, allowing subscribers
+%      to easily pattern-match on the messages they receive.
 -spec publish(group(), tag(), term()) -> ok | {error, term()}.
 publish(Group, Tag, Data) ->
   try ets:lookup_element(propagator_groups, Group, 2) of
@@ -121,7 +121,7 @@ unsubscribe(Group) ->
 unsubscribe(Group, Pid) ->
   pg2:leave(Group, Pid).
 
-% @doc Returns a list of all created groups.
+% @doc Returns a list of all existing groups.
 -spec groups() -> [group()].
 groups() ->
   ets:foldl(fun({Group, _Pid}, Acc) ->
@@ -150,7 +150,7 @@ is_subscriber(Group, Pid) ->
 %      Currently the following keys are returned:<br />
 %      `group': The name of the group<br />
 %      `subscriber_count': Current number of subscribers<br />
-%      `message_count': Number if unique messages this process (group) sent
+%      `message_count': Number of unique messages this process (group) sent
 -spec statistics(group()) -> {ok, [{atom(), term()}]} | {error, term()}.
 statistics(Group) ->
   try ets:lookup_element(propagator_groups, Group, 2) of
