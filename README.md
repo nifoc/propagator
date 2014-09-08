@@ -21,9 +21,9 @@ ok = propagator:delete(demo),
 false = propagator:is_group(demo).
 ```
 
-In order to subscribe to a group, it has to be created first. This can be done using the `propagator:create/1` method. If at any point you need to remove a group again, you do that using `propagator:delete/1`.
+In order to subscribe to a group, it has to be created first. This can be done using the `propagator:create/1` method. If at any point you need to remove a group again, you can do that using `propagator:delete/1`.
 
-You can check if a process is subscribed to a group using `propagator:is_subscriber/2` and get a list of all subscribers by calling `propagator:subscribers/1`.
+Checking if a process is subscribed to a group is done by using `propagator:is_subscriber/2` and getting a list of all subscribers can be achieved by calling `propagator:subscribers/1`.
 
 ```erlang
 IsSubscriber = propagator:is_subscriber(demo, self()), % => true | false
@@ -46,7 +46,7 @@ Publishing a message to a group is done by calling `propagator:publish/3`. The p
 ok = propagator:publish(demo, some_tag, [{any, data}]).
 ```
 
-All messages are tagged, so that subscribing processes can easily pattern-match of incoming messages. The third argument can be anything you want.
+All messages are tagged, so that subscribing processes can easily pattern-match on incoming messages. The third argument can be anything you want.
 
 You can unsubscribe any process using the `propagator:unsubscribe/2` method. `propagator:unsubscribe/1` also exists to remove the subscription of `self()`.
 
