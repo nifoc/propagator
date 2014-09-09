@@ -61,10 +61,12 @@ loop(#group_state{group=Group, msg_count=MsgCount}=State) ->
       ok = lists:foreach(fun(Member) -> Member ! Msg end, Members),
       State#group_state{msg_count=MsgCount+1};
     {statistics, From, Ref} ->
+      {message_queue_len, MsgQueue} = process_info(self(), message_queue_len),
       Stats = [
         {group, Group},
         {subscriber_count, length(propagator:subscribers(Group))},
-        {message_count, MsgCount}
+        {message_count, MsgCount},
+        {message_queue, MsgQueue}
       ],
       _ = From ! {Ref, Stats},
       State;

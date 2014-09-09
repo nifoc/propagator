@@ -150,7 +150,8 @@ is_subscriber(Group, Pid) ->
 %      Currently the following keys are returned:<br />
 %      `group': The name of the group<br />
 %      `subscriber_count': Current number of subscribers<br />
-%      `message_count': Number of unique messages this process (group) sent
+%      `message_count': Number of unique messages this process (group) sent<br />
+%      `message_queue': Number of messages that are currently queued up (actual Erlang message queue)
 -spec statistics(group()) -> {ok, [{atom(), term()}]} | {error, term()}.
 statistics(Group) ->
   try ets:lookup_element(propagator_groups, Group, 2) of
