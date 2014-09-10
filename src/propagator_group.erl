@@ -18,10 +18,13 @@
 
 -record(group_state, {
   group :: propagator:group(),
-  msg_count :: non_neg_integer()
+  msg_count :: non_neg_integer(),
+  callback :: callback()
 }).
 
 -type state() :: #group_state{}.
+
+-type callback() :: {module(), atom()} | undefined.
 
 % API
 -export([
@@ -49,16 +52,18 @@ start_link(Group) ->
 -spec init(propagator:group()) -> no_return().
 init(Group) ->
   _ = process_flag(trap_exit, true),
-  State = #group_state{group=Group, msg_count=0},
+  Callback = application:get_env(propagator, callback),
+  State = #group_state{group=Group, msg_count=0, callback=Callback},
   loop(State).
 
 % @hidden
 -spec loop(state()) -> no_return().
-loop(#group_state{group=Group, msg_count=MsgCount}=State) ->
+loop(#group_state{group=Group, msg_count=MsgCount, callback=Callback}=State) ->
   State2 = receive
-    {send_message, _From, {Group, _Tag, _Data}=Msg} ->
+    {send_message, From, {Group, _Tag, _Data}=Msg} ->
       Members = propagator:subscribers(Group),
       ok = lists:foreach(fun(Member) -> Member ! Msg end, Members),
+      ok = maybe_invoke_callback(Callback, From, Msg),
       State#group_state{msg_count=MsgCount+1};
     {statistics, From, Ref} ->
       {message_queue_len, MsgQueue} = process_info(self(), message_queue_len),
@@ -79,6 +84,13 @@ loop(#group_state{group=Group, msg_count=MsgCount}=State) ->
   ?MODULE:loop(State2).
 
 % Private
+
+-spec maybe_invoke_callback(callback(), pid(), {propagator:group(), propagator:tag(), term()}) -> ok.
+maybe_invoke_callback(undefined, _From, _Msg) ->
+  ok;
+maybe_invoke_callback({Mod, Fun}, From, Msg) ->
+  _ = apply(Mod, Fun, [From, Msg]),
+  ok.
 
 -spec terminate(atom(), state()) -> no_return().
 terminate(Reason, #group_state{group=Group}) ->
