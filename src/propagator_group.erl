@@ -24,7 +24,7 @@
 
 -type state() :: #group_state{}.
 
--type callback() :: {module(), atom()} | undefined.
+-type callback() :: [{module(), atom()}] | {module(), atom()} | undefined.
 
 % API
 -export([
@@ -88,9 +88,14 @@ loop(#group_state{group=Group, msg_count=MsgCount, callback=Callback}=State) ->
 -spec maybe_invoke_callback(callback(), pid(), {propagator:group(), propagator:tag(), term()}) -> ok.
 maybe_invoke_callback(undefined, _From, _Msg) ->
   ok;
+maybe_invoke_callback([], _From, _Msg) ->
+  ok;
 maybe_invoke_callback({Mod, Fun}, From, Msg) ->
   _ = apply(Mod, Fun, [From, Msg]),
-  ok.
+  ok;
+maybe_invoke_callback([{Mod, Fun}|Rest], From, Msg) ->
+  _ = apply(Mod, Fun, [From, Msg]),
+  maybe_invoke_callback(Rest, From, Msg).
 
 -spec terminate(atom(), state()) -> no_return().
 terminate(Reason, #group_state{group=Group}) ->
