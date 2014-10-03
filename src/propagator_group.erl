@@ -16,6 +16,8 @@
 
 -module(propagator_group).
 
+-define(DEFAULT_CALLBACK, undefined).
+
 -record(group_state, {
   group :: propagator:group(),
   msg_count :: non_neg_integer(),
@@ -52,7 +54,7 @@ start_link(Group) ->
 -spec init(propagator:group()) -> no_return().
 init(Group) ->
   _ = process_flag(trap_exit, true),
-  Callback = application:get_env(propagator, callback),
+  Callback = application:get_env(propagator, callback, ?DEFAULT_CALLBACK),
   State = #group_state{group=Group, msg_count=0, callback=Callback},
   loop(State).
 

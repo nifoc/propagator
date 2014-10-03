@@ -26,6 +26,7 @@
   messages/1,
   no_messages/1,
   stats/1,
+  callbacks/1,
   ignore_unknown_messages/1
 ]).
 
@@ -38,6 +39,7 @@ all() ->
     messages,
     no_messages,
     stats,
+    callbacks,
     ignore_unknown_messages
   ].
 
@@ -116,6 +118,13 @@ stats(_Config) ->
   {ok, Stats} = propagator:statistics(test),
   {group, test} = lists:keyfind(group, 1, Stats),
   true = proplists:get_value(message_count, Stats) > 0.
+
+callbacks(_Config) ->
+  ok = propagator:create(test_cb1),
+  ok = propagator:publish(test_cb1, test, test),
+  ok = application:set_env(propagator, callback, []),
+  ok = propagator:create(test_cb2),
+  ok = propagator:publish(test_cb2, test, test).
 
 ignore_unknown_messages(_Config) ->
   Pid = ets:lookup_element(propagator_groups, test, 2),
