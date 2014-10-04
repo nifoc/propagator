@@ -124,7 +124,13 @@ callbacks(_Config) ->
   ok = propagator:publish(test_cb1, test, test),
   ok = application:set_env(propagator, callback, []),
   ok = propagator:create(test_cb2),
-  ok = propagator:publish(test_cb2, test, test).
+  ok = propagator:publish(test_cb2, test, test),
+  ok = application:set_env(propagator, callback, {group_callback, noop}),
+  ok = propagator:create(test_cb3),
+  ok = propagator:publish(test_cb3, test, test),
+  ok = application:set_env(propagator, callback, [{group_callback, noop}]),
+  ok = propagator:create(test_cb4),
+  ok = propagator:publish(test_cb4, test, test).
 
 ignore_unknown_messages(_Config) ->
   Pid = ets:lookup_element(propagator_groups, test, 2),
