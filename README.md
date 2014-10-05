@@ -56,7 +56,7 @@ ok = propagator:unsubscribe(demo).
 
 ## Resources
 
-* [Generated EDoc](http://propagator.nifoc.pw/0.1/) ([All Versions](http://propagator.nifoc.pw))
+* [Generated EDoc](http://propagator.nifoc.pw/0.2/) ([All Versions](http://propagator.nifoc.pw))
 
 ## License
 

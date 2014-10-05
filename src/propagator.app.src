@@ -1,6 +1,6 @@
 {application, propagator, [
   {description, "Pub/Sub for Erlang processes."},
-  {vsn, "0.1"},
+  {vsn, "0.2"},
   {modules, []},
   {registered, [
     propagator_sup

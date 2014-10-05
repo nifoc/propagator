@@ -1,5 +1,5 @@
 PROJECT = propagator
-PROJECT_VERSION = 0.1
+PROJECT_VERSION = 0.2
 
 TEST_DEPS = nifoc_ct_helper
 dep_nifoc_ct_helper = git https://github.com/nifoc/nifoc_ct_helper master
