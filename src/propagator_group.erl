@@ -60,25 +60,17 @@ init(Group) ->
 
 % @hidden
 -spec loop(state()) -> no_return().
-loop(#group_state{group=Group, msg_count=MsgCount, callback=Callback}=State) ->
+loop(#group_state{msg_count=MsgCount, callback=Callback}=State) ->
   State2 = receive
-    {send_message, From, {Group, _Tag, _Data}=Msg} ->
-      Members = propagator:subscribers(Group),
-      ok = lists:foreach(fun(Member) -> Member ! Msg end, Members),
+    {send_message, From, Msg} ->
+      ok = send_message(Msg),
       ok = maybe_invoke_callback(Callback, From, Msg),
       State#group_state{msg_count=MsgCount+1};
     {statistics, From, Ref} ->
-      {message_queue_len, MsgQueue} = process_info(self(), message_queue_len),
-      Stats = [
-        {group, Group},
-        {subscriber_count, length(propagator:subscribers(Group))},
-        {message_count, MsgCount},
-        {message_queue, MsgQueue}
-      ],
-      _ = From ! {Ref, Stats},
+      statistics(From, Ref, State),
       State;
-    {terminate, _From} -> terminate(normal, State);
-    {'EXIT', _From, Reason} -> terminate(Reason, State);
+    {'EXIT', _From, Reason} ->
+      terminate(Reason, State);
     Msg ->
       ok = error_logger:error_msg("Propagator group received unexpected message: ~p~n", [Msg]),
       State
@@ -86,6 +78,23 @@ loop(#group_state{group=Group, msg_count=MsgCount, callback=Callback}=State) ->
   ?MODULE:loop(State2).
 
 % Private
+
+-spec send_message({propagator:group(), propagator:tag(), term()}) -> ok.
+send_message({Group, _Tag, _Data}=Msg) ->
+  Members = propagator:subscribers(Group),
+  lists:foreach(fun(Member) -> Member ! Msg end, Members).
+
+-spec statistics(pid(), reference(), state()) -> ok.
+statistics(From, Ref, #group_state{group=Group, msg_count=MsgCount}) ->
+  {message_queue_len, MsgQueue} = process_info(self(), message_queue_len),
+  Stats = [
+    {group, Group},
+    {subscriber_count, length(propagator:subscribers(Group))},
+    {message_count, MsgCount},
+    {message_queue, MsgQueue}
+  ],
+  _ = From ! {Ref, Stats},
+  ok.
 
 -spec maybe_invoke_callback(callback(), pid(), {propagator:group(), propagator:tag(), term()}) -> ok.
 maybe_invoke_callback(undefined, _From, _Msg) ->

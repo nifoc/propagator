@@ -160,8 +160,7 @@ statistics(Group) ->
       _ = Pid ! {statistics, self(), Ref},
       receive
         {Ref, Stats} -> {ok, Stats}
-      after
-        5000 -> {error, timeout}
+      after 5000 -> {error, timeout}
       end
   catch
     error:badarg -> {error, {no_such_group, Group}}
